@@ -14,6 +14,7 @@ void FreeQol();
 void InitQol();
 void DrawMonsterHealthBar(CelOutputBuffer out);
 void DrawXPBar(CelOutputBuffer out);
+void RepeatClicks();
 void AutoGoldPickup(int pnum);
 
 DEVILUTION_END_NAMESPACE
