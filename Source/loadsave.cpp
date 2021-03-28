@@ -824,7 +824,7 @@ bool IsHeaderValid(Uint32 magicNumber)
 	return false;
 }
 
-void ConvertLevels()
+static void ConvertLevels()
 {
 	// Backup current level state
 	bool _setlevel = setlevel;
@@ -908,6 +908,17 @@ void SaveHotkeys()
 	}
 	file.writeLE<Sint32>(plr[myplr]._pRSpell);
 	file.writeLE<Uint8>(plr[myplr]._pRSplType);
+}
+
+void LoadHeroItems(PlayerStruct *pPlayer)
+{
+	LoadHelper file("heroitems");
+	if (!file.isValid())
+		return;
+
+	LoadItems(&file, NUM_INVLOC, pPlayer->InvBody);
+	LoadItems(&file, NUM_INV_GRID_ELEM, pPlayer->InvList);
+	LoadItems(&file, MAXBELTITEMS, pPlayer->SpdList);
 }
 
 /**
@@ -1665,6 +1676,16 @@ static void SavePortal(SaveHelper *file, int i)
 	file->writeLE<Sint32>(pPortal->level);
 	file->writeLE<Sint32>(pPortal->ltype);
 	file->writeLE<Uint32>(pPortal->setlvl);
+}
+
+void SaveHeroItems(PlayerStruct *pPlayer)
+{
+	size_t items = NUM_INVLOC + NUM_INV_GRID_ELEM + MAXBELTITEMS;
+	SaveHelper file("heroitems", items * sizeof(ItemStruct));
+
+	SaveItems(&file, pPlayer->InvBody, NUM_INVLOC);
+	SaveItems(&file, pPlayer->InvList, NUM_INV_GRID_ELEM);
+	SaveItems(&file, pPlayer->SpdList, MAXBELTITEMS);
 }
 
 void SaveGame()

@@ -6,6 +6,8 @@
 #ifndef __LOADSAVE_H__
 #define __LOADSAVE_H__
 
+#include "player.h"
+
 DEVILUTION_BEGIN_NAMESPACE
 
 #ifdef __cplusplus
@@ -19,8 +21,10 @@ int RemapItemIdxFromDiablo(int i);
 int RemapItemIdxToDiablo(int i);
 bool IsHeaderValid(Uint32 magicNumber);
 void LoadHotkeys();
+void LoadHeroItems(PlayerStruct *pPlayer);
 void LoadGame(BOOL firstflag);
 void SaveHotkeys();
+void SaveHeroItems(PlayerStruct *pPlayer);
 void SaveGame();
 void SaveLevel();
 void LoadLevel();
