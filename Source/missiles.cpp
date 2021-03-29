@@ -1308,7 +1308,6 @@ void InitMissiles()
 {
 	int mi, src, i, j;
 
-	AutoMapShowItems = FALSE;
 	plr[myplr]._pSpellFlags &= ~0x1;
 	if (plr[myplr]._pInfraFlag == TRUE) {
 		for (i = 0; i < nummissiles; ++i) {
@@ -1976,7 +1975,6 @@ void AddSearch(Sint32 mi, Sint32 sx, Sint32 sy, Sint32 dx, Sint32 dy, Sint32 mid
 	missile[mi]._miVar6 = 0;
 	missile[mi]._miVar7 = 0;
 	missile[mi]._miVar8 = 0;
-	AutoMapShowItems = TRUE;
 	int lvl = 2;
 	if (id > 0)
 		lvl = plr[id]._pLevel * 2;
@@ -4292,7 +4290,6 @@ void MI_Search(Sint32 i)
 	if (missile[i]._mirange == 0) {
 		missile[i]._miDelFlag = TRUE;
 		PlaySfxLoc(IS_CAST7, plr[missile[i]._miVar1]._px, plr[missile[i]._miVar1]._py);
-		AutoMapShowItems = FALSE;
 	}
 }
 

@@ -676,8 +676,8 @@ void DrawAutomap(CelOutputBuffer out)
 			DrawAutomapPlr(out, pnum);
 		}
 	}
-	if (AutoMapShowItems)
-		SearchAutomapItem(out);
+
+	SearchAutomapItem(out);
 	DrawAutomapText(out);
 }
 
