@@ -38,6 +38,7 @@ void PackItem(PkItemStruct *id, const ItemStruct *is)
 			id->bMCh = is->_iMaxCharges;
 			if (is->IDidx == IDI_GOLD)
 				id->wValue = SwapLE16(is->_ivalue);
+			id->dwBuff = is->dwBuff;
 		}
 	}
 }
@@ -169,6 +170,11 @@ void UnPackItem(const PkItemStruct *is, ItemStruct *id)
 		item[MAXITEMS]._iMaxDur = is->bMDur;
 		item[MAXITEMS]._iCharges = is->bCh;
 		item[MAXITEMS]._iMaxCharges = is->bMCh;
+
+		if (gbIsHellfire)
+			item[MAXITEMS].dwBuff |= 1;
+		else
+			item[MAXITEMS].dwBuff &= ~1;
 	}
 	*id = item[MAXITEMS];
 }
@@ -191,14 +197,11 @@ void VerifyGoldSeeds(PlayerStruct *pPlayer)
 	}
 }
 
-void UnPackPlayer(PkPlayerStruct *pPack, int pnum, BOOL killok)
+void UnPackPlayer(PkPlayerStruct *pPack, int pnum, BOOL netSync)
 {
-	PlayerStruct *pPlayer;
-	int i;
-	ItemStruct *pi;
-	PkItemStruct *pki;
+	bool _gbIsHellfire = gbIsHellfire;
 
-	pPlayer = &plr[pnum];
+	PlayerStruct *pPlayer = &plr[pnum];
 	pPlayer->_px = pPack->px;
 	pPlayer->_py = pPack->py;
 	pPlayer->_pfutx = pPack->px;
@@ -226,7 +229,7 @@ void UnPackPlayer(PkPlayerStruct *pPack, int pnum, BOOL killok)
 	pPlayer->_pMaxHPBase = SwapLE32(pPack->pMaxHPBase);
 	pPlayer->_pHPBase = SwapLE32(pPack->pHPBase);
 	pPlayer->_pBaseToBlk = ToBlkTbl[pPlayer->_pClass];
-	if (!killok)
+	if (!netSync)
 		if ((int)(pPlayer->_pHPBase & 0xFFFFFFC0) < 64)
 			pPlayer->_pHPBase = 64;
 
@@ -234,46 +237,43 @@ void UnPackPlayer(PkPlayerStruct *pPack, int pnum, BOOL killok)
 	pPlayer->_pManaBase = SwapLE32(pPack->pManaBase);
 	pPlayer->_pMemSpells = SDL_SwapLE64(pPack->pMemSpells);
 
-	for (i = 0; i < 37; i++) // Should be MAX_SPELLS but set to 36 to make save games compatible
+	for (int i = 0; i < 37; i++) // Should be MAX_SPELLS but set to 36 to make save games compatible
 		pPlayer->_pSplLvl[i] = pPack->pSplLvl[i];
-	for (i = 37; i < 47; i++)
+	for (int i = 37; i < 47; i++)
 		pPlayer->_pSplLvl[i] = pPack->pSplLvl2[i - 37];
 
-	pki = &pPack->InvBody[0];
-	pi = &pPlayer->InvBody[0];
-
-	for (i = 0; i < NUM_INVLOC; i++) {
-		UnPackItem(pki, pi);
-		pki++;
-		pi++;
+	for (int i = 0; i < NUM_INVLOC; i++) {
+		if (netSync) {
+			gbIsHellfireSaveGame = (pPack->InvBody[i].dwBuff & 1) == 1;
+			gbIsHellfire = gbIsHellfireSaveGame;
+		}
+		UnPackItem(&pPack->InvBody[i], &pPlayer->InvBody[i]);
 	}
 
-	pki = &pPack->InvList[0];
-	pi = &pPlayer->InvList[0];
-
-	for (i = 0; i < NUM_INV_GRID_ELEM; i++) {
-		UnPackItem(pki, pi);
-		pki++;
-		pi++;
+	for (int i = 0; i < NUM_INV_GRID_ELEM; i++) {
+		if (netSync) {
+			gbIsHellfireSaveGame = (pPack->InvList[i].dwBuff & 1) == 1;
+			gbIsHellfire = gbIsHellfireSaveGame;
+		}
+		UnPackItem(&pPack->InvList[i], &pPlayer->InvList[i]);
 	}
 
-	for (i = 0; i < NUM_INV_GRID_ELEM; i++)
+	for (int i = 0; i < NUM_INV_GRID_ELEM; i++)
 		pPlayer->InvGrid[i] = pPack->InvGrid[i];
 
 	pPlayer->_pNumInv = pPack->_pNumInv;
 	VerifyGoldSeeds(pPlayer);
 
-	pki = &pPack->SpdList[0];
-	pi = &pPlayer->SpdList[0];
-
-	for (i = 0; i < MAXBELTITEMS; i++) {
-		UnPackItem(pki, pi);
-		pki++;
-		pi++;
+	for (int i = 0; i < MAXBELTITEMS; i++) {
+		if (netSync) {
+			gbIsHellfireSaveGame = (pPack->SpdList[i].dwBuff & 1) == 1;
+			gbIsHellfire = gbIsHellfireSaveGame;
+		}
+		UnPackItem(&pPack->SpdList[i], &pPlayer->SpdList[i]);
 	}
 
 	if (pnum == myplr) {
-		for (i = 0; i < 20; i++)
+		for (int i = 0; i < 20; i++)
 			witchitem[i]._itype = ITYPE_NONE;
 	}
 
@@ -288,6 +288,8 @@ void UnPackPlayer(PkPlayerStruct *pPack, int pnum, BOOL killok)
 	pPlayer->pManaShield = SwapLE32(pPack->pManaShield);
 	pPlayer->pDifficulty = SwapLE32(pPack->pDifficulty);
 	pPlayer->pDamAcFlags = SwapLE32(pPack->pDamAcFlags);
+
+	gbIsHellfire = _gbIsHellfire;
 }
 
 DEVILUTION_END_NAMESPACE

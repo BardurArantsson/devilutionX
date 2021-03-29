@@ -261,7 +261,7 @@ static void LoadItemData(LoadHelper *file, ItemStruct *pItem)
 	if (!gbIsHellfireSaveGame) {
 		pItem->IDidx = RemapItemIdxFromDiablo(pItem->IDidx);
 	}
-	file->skip(4); // Unused
+	pItem->dwBuff = file->nextBool32();
 	if (gbIsHellfireSaveGame)
 		pItem->_iDamAcFlags = file->nextLE<Sint32>();
 	else
@@ -1203,7 +1203,7 @@ static void SaveItem(SaveHelper *file, ItemStruct *pItem)
 	file->skip(1); // Alignment
 	file->writeLE<Uint32>(pItem->_iStatFlag);
 	file->writeLE<Sint32>(idx);
-	file->skip(4); // Unused
+	file->writeLE<Uint32>(pItem->dwBuff);
 	if (gbIsHellfire)
 		file->writeLE<Uint32>(pItem->_iDamAcFlags);
 }

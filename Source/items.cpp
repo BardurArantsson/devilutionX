@@ -1284,6 +1284,8 @@ void SetPlrHandItem(ItemStruct *h, int idata)
 	h->_iSufPower = IPL_INVALID;
 	h->_iMagical = ITEM_QUALITY_NORMAL;
 	h->IDidx = idata;
+	if (gbIsHellfire)
+		h->dwBuff |= 1;
 }
 
 void GetPlrHandSeed(ItemStruct *h)
@@ -1853,6 +1855,8 @@ void GetItemAttrs(int i, int idata, int lvl)
 	item[i]._iMinMag = AllItemsList[idata].iMinMag;
 	item[i]._iMinDex = AllItemsList[idata].iMinDex;
 	item[i].IDidx = idata;
+	if (gbIsHellfire)
+		item[i].dwBuff |= 1;
 	item[i]._iPrePower = IPL_INVALID;
 	item[i]._iSufPower = IPL_INVALID;
 

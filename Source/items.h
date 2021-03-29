@@ -121,6 +121,7 @@ typedef struct ItemStruct {
 	Sint8 _iMinDex;
 	bool _iStatFlag;
 	Sint32 IDidx;
+	Uint32 dwBuff;
 	Sint32 _iDamAcFlags;
 
 	/**

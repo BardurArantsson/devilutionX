@@ -2479,7 +2479,13 @@ int SyncPutItem(int pnum, int x, int y, int idx, WORD icreateinfo, int iseed, in
 	if (idx == IDI_EAR) {
 		RecreateEar(ii, icreateinfo, iseed, Id, dur, mdur, ch, mch, ivalue, ibuff);
 	} else {
+		bool _gbIsHellfire = gbIsHellfire;
+		if (gbIsMultiplayer) {
+			gbIsHellfireSaveGame = (ibuff & 1) == 1;
+			gbIsHellfire = gbIsHellfireSaveGame;
+		}
 		RecreateItem(ii, idx, icreateinfo, iseed, ivalue);
+		gbIsHellfire = _gbIsHellfire;
 		if (Id)
 			item[ii]._iIdentified = TRUE;
 		item[ii]._iDurability = dur;
@@ -2492,6 +2498,7 @@ int SyncPutItem(int pnum, int x, int y, int idx, WORD icreateinfo, int iseed, in
 		item[ii]._iMinMag = min_mag;
 		item[ii]._iMinDex = min_dex;
 		item[ii]._iAC = ac;
+		item[ii].dwBuff = ibuff;
 	}
 
 	item[ii]._ix = x;
